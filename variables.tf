@@ -24,6 +24,12 @@ variable "skip_region_validation" {
 #####################
 # image-create
 #####################
+variable "create" {
+  description = "Whether to create image."
+  type        = bool
+  default     = true
+}
+
 variable "image_name" {
   description = "The name of image."
   type        = string

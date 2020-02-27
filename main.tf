@@ -12,7 +12,7 @@ resource "random_uuid" "this" {}
 # create image by instance_id
 #####################
 resource "alicloud_image" "with_instance" {
-  count = var.instance_id != "" ? 1 : 0
+  count = var.create ? var.instance_id != "" ? 1 : 0 : 0
 
   image_name        = var.image_name != "" ? var.image_name : substr("tf-instance-image-${replace(random_uuid.this.result, "-", "")}", 0, 32)
   architecture      = var.image_create_architecture
@@ -31,7 +31,7 @@ resource "alicloud_image" "with_instance" {
 # create image by snapshot_id
 #####################
 resource "alicloud_image" "with_snapshot" {
-  count = var.snapshot_id != "" ? 1 : 0
+  count = var.create ? var.snapshot_id != "" ? 1 : 0 : 0
 
   image_name        = var.image_name != "" ? var.image_name : substr("tf-snapshot-image-${replace(random_uuid.this.result, "-", "")}", 0, 32)
   architecture      = var.image_create_architecture
@@ -50,7 +50,7 @@ resource "alicloud_image" "with_snapshot" {
 # create image by disk
 #####################
 resource "alicloud_image" "with_disk" {
-  count = length(var.disk_device_mapping) > 0 ? 1 : 0
+  count = var.create ? length(var.disk_device_mapping) > 0 ? 1 : 0 : 0
 
   image_name        = var.image_name != "" ? var.image_name : substr("tf-disk-image-${replace(random_uuid.this.result, "-", "")}", 0, 32)
   architecture      = var.image_create_architecture

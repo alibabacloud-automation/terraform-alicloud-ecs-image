@@ -22,6 +22,10 @@ Terraform模块用于在阿里云上通过 ECS 实例 ID 或者快照 ID 创建�
 ```hcl
 module "image_create" {
   source      = "terraform-alicloud-modules/ecs-image/alicloud"
+  region      = "cn-shanghai"
+  profile     = "Your-Profile-Name"
+
+  create      = true
   instance_id = "i-uf6etbb1qr3hri95****"
 }
 ```
@@ -31,6 +35,10 @@ module "image_create" {
 ```hcl
 module "image_create" {
   source      = "terraform-alicloud-modules/ecs-image/alicloud"
+  region      = "cn-shanghai"
+  profile     = "Your-Profile-Name"
+
+  create      = true
   disk_device_mapping = [
     {
       device      = "/dev/xvda"
@@ -51,6 +59,10 @@ module "image_create" {
 ```hcl
 module "image_create" {
   source      = "terraform-alicloud-modules/ecs-image/alicloud"
+  region      = "cn-shanghai"
+  profile     = "Your-Profile-Name"
+
+  create      = true
   snapshot_id = "s-uf6bdgo6775mf8k*****"
 }
 ```
@@ -60,6 +72,10 @@ module "image_create" {
 ```hcl
 module "image_create" {
   source            = "terraform-alicloud-modules/ecs-image/alicloud"
+  region            = "cn-shanghai"
+  profile           = "Your-Profile-Name"
+
+  create            = true
   snapshot_id       = "s-uf6bdgo6775mf8k7****"
   share             = true
   account_ids       = ["123456789012****"]
@@ -73,6 +89,9 @@ module "image_create" {
 ```hcl
 module "image_export" {
   source            = "terraform-alicloud-modules/ecs-image/alicloud"
+  region            = "cn-shanghai"
+  profile           = "Your-Profile-Name"
+
   export            = true
   image_id          = ["m-uf6gkgbv29y104788x97"]
   export_oss_bucket = "iamge-bucket"
@@ -84,6 +103,9 @@ module "image_export" {
 ```hcl
 module "image_import" {
   source            = "terraform-alicloud-modules/ecs-image/alicloud"
+  region            = "cn-shanghai"
+  profile           = "Your-Profile-Name"
+
   import            = true
   import_image_name = "tf-001"
   import_disk_device_mapping = {
