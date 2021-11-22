@@ -14,10 +14,6 @@ These types of resources are supported:
 * [Image_import](https://www.terraform.io/docs/providers/alicloud/r/image_import.html)
 * [Image_share_permission](https://www.terraform.io/docs/providers/alicloud/r/image_share_permission.html)
 
-## Terraform versions
-
-The Module requires Terraform 0.12 and Terraform Provider AliCloud 1.69.0+.
-
 ## Usage
 
 Create a image by instance_id.
@@ -25,8 +21,6 @@ Create a image by instance_id.
 ```hcl
 module "image_create" {
   source      = "terraform-alicloud-modules/ecs-image/alicloud"
-  region      = "cn-shanghai"
-  profile     = "Your-Profile-Name"
 
   create      = true
   instance_id = "i-uf6etbb1qr3hri95****"
@@ -38,8 +32,6 @@ Create a image by snapshot_id.
 ```hcl
 module "image_create" {
   source      = "terraform-alicloud-modules/ecs-image/alicloud"
-  region      = "cn-shanghai"
-  profile     = "Your-Profile-Name"
 
   create      = true
   snapshot_id = "s-uf6bdgo6775mf8k*****"
@@ -51,8 +43,6 @@ Create a image by combined disk.
 ```hcl
 module "image_create" {
   source      = "terraform-alicloud-modules/ecs-image/alicloud"
-  region      = "cn-shanghai"
-  profile     = "Your-Profile-Name"
 
   create      = true
   disk_device_mapping = [
@@ -75,8 +65,6 @@ Create a image by instance_id and share the image and export the image to oss_bu
 ```hcl
 module "image_create" {
   source            = "terraform-alicloud-modules/ecs-image/alicloud"
-  region            = "cn-shanghai"
-  profile           = "Your-Profile-Name"
 
   create            = true
   snapshot_id       = "s-uf6bdgo6775mf8k7****"
@@ -92,8 +80,6 @@ Export the image by image_id.
 ```hcl
 module "image_export" {
   source            = "terraform-alicloud-modules/ecs-image/alicloud"
-  region            = "cn-shanghai"
-  profile           = "Your-Profile-Name"
 
   export            = true
   image_id          = ["m-uf6gkgbv29y10478****"]
@@ -106,8 +92,6 @@ Import image form oss_bucket.
 ```hcl
 module "image_import" {
   source            = "terraform-alicloud-modules/ecs-image/alicloud"
-  region            = "cn-shanghai"
-  profile           = "Your-Profile-Name"
 
   import            = true
   import_image_name = "tf-001"
@@ -134,8 +118,66 @@ This Module provides templates for coping image and sharing image.
 
 
 ## Notes
-* This module using AccessKey and SecretKey are from `profile` and `shared_credentials_file`.
-If you have not set them yet, please install [aliyun-cli](https://github.com/aliyun/aliyun-cli#installation) and configure it.
+From the version v1.2.0, the module has removed the following `provider` setting:
+
+```hcl
+provider "alicloud" {
+  profile                 = var.profile != "" ? var.profile : null
+  shared_credentials_file = var.shared_credentials_file != "" ? var.shared_credentials_file : null
+  region                  = var.region != "" ? var.region : null
+  skip_region_validation  = var.skip_region_validation
+  configuration_source    = "terraform-alicloud-modules/ecs-image"
+}
+```
+
+If you still want to use the `provider` setting to apply this module, you can specify a supported version, like 1.1.0:
+
+```hcl
+module "image_create" {
+  source  = "terraform-alicloud-modules/ecs-image/alicloud"
+  version = "1.1.0"
+  region  = "cn-shanghai"
+  profile = "Your-Profile-Name"
+  create  = true
+  // ...
+}
+```
+
+If you want to upgrade the module to 1.2.0 or higher in-place, you can define a provider which same region with
+previous region:
+
+```hcl
+provider "alicloud" {
+  region  = "cn-shanghai"
+  profile = "Your-Profile-Name"
+}
+module "image_create" {
+  source  = "terraform-alicloud-modules/ecs-image/alicloud"
+  create  = true
+  // ...
+}
+```
+or specify an alias provider with a defined region to the module using `providers`:
+
+```hcl
+provider "alicloud" {
+  region  = "cn-shanghai"
+  profile = "Your-Profile-Name"
+  alias   = "sh"
+}
+module "image_create" {
+  source    = "terraform-alicloud-modules/ecs-image/alicloud"
+  providers = {
+    alicloud = alicloud.sh
+  }
+  create    = true
+  // ...
+}
+```
+
+and then run `terraform init` and `terraform apply` to make the defined provider effect to the existing module state.
+
+More details see [How to use provider in the module](https://www.terraform.io/docs/language/modules/develop/providers.html#passing-providers-explicitly)
 
 Submit Issues
 -------------
@@ -145,7 +187,7 @@ If you have any problems when using this module, please opening a [provider issu
 
 Authors
 -------
-Created and maintained by Zhou qilin(z17810666992@163.com), He Guimin(@xiaozhu36, heguimin36@163.com).
+Created and maintained by Alibaba Cloud Terraform Team(terraform@alibabacloud.com)
 
 License
 ----
