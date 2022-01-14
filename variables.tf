@@ -9,6 +9,7 @@ variable "profile" {
   type        = string
   default     = ""
 }
+
 variable "shared_credentials_file" {
   description = "(Deprecated from version 1.2.0) This is the path to the shared credentials file. If this is not set and a profile is specified, $HOME/.aliyun/config.json will be used."
   type        = string
@@ -27,11 +28,41 @@ variable "skip_region_validation" {
 variable "create" {
   description = "Whether to create image."
   type        = bool
+  default     = false
+}
+
+variable "create_image_by_instance" {
+  description = "Whether to create image by instance."
+  type        = bool
+  default     = true
+}
+
+variable "create_image_by_snapshot" {
+  description = "Whether to create image by snapshot."
+  type        = bool
+  default     = true
+}
+
+variable "create_image_by_disk" {
+  description = "Whether to create image by disk."
+  type        = bool
   default     = true
 }
 
 variable "image_name" {
-  description = "The name of image."
+  description = "The name of image created by instance."
+  type        = string
+  default     = ""
+}
+
+variable "snapshot_image_name" {
+  description = "The name of image created by snapshot."
+  type        = string
+  default     = ""
+}
+
+variable "disk_image_name" {
+  description = "The name of image created by disk."
   type        = string
   default     = ""
 }
@@ -50,6 +81,24 @@ variable "instance_id" {
 
 variable "snapshot_id" {
   description = "The id of snapshot."
+  type        = string
+  default     = ""
+}
+
+variable "instance_image_description" {
+  description = "The description of the image created by instance."
+  type        = string
+  default     = ""
+}
+
+variable "snapshot_image_description" {
+  description = "The description of the image created by snapshot."
+  type        = string
+  default     = ""
+}
+
+variable "disk_image_description" {
+  description = "The description of the image created by disk."
   type        = string
   default     = ""
 }
@@ -97,6 +146,39 @@ variable "disk_device_mapping" {
 }
 
 #####################
+# image-export
+#####################
+variable "export" {
+  description = "Whether to export the image. Default to 'false'."
+  type        = bool
+  default     = false
+}
+
+variable "export_image_ids" {
+  description = "The id of image by export"
+  type        = list(string)
+  default     = []
+}
+
+variable "export_oss_bucket" {
+  description = "Save the exported OSS bucket."
+  type        = string
+  default     = ""
+}
+
+variable "oss_prefix" {
+  description = "The prefix of your OSS Object. Default to 'tf'."
+  type        = string
+  default     = "tf"
+}
+
+variable "create_timeouts" {
+  description = "Used when exporting the image (until it reaches the initial Available status)."
+  type        = string
+  default     = "20m"
+}
+
+#####################
 # image-import
 #####################
 variable "import" {
@@ -120,7 +202,7 @@ variable "image_import_architecture" {
 variable "description" {
   description = "The description of the image."
   type        = string
-  default     = "Image created by terraform"
+  default     = ""
 }
 
 variable "license_type" {
@@ -148,37 +230,22 @@ variable "import_disk_device_mapping" {
 }
 
 #####################
-# image-export
-#####################
-variable "export" {
-  description = "Whether to export the image. Default to 'false'."
-  type        = bool
-  default     = false
-}
-
-variable "export_oss_bucket" {
-  description = "Save the exported OSS bucket."
-  type        = string
-  default     = ""
-}
-
-variable "oss_prefix" {
-  description = "The prefix of your OSS Object. Default to 'tf'."
-  type        = string
-  default     = "tf"
-}
-
-#####################
 # image-share-permission-permisstion
 #####################
-variable "account_ids" {
-  description = "Alibaba Cloud account id used to share images."
-  type        = list(string)
-  default     = []
-}
-
 variable "share" {
   description = "Whether to share the image. Default to 'false'."
   type        = bool
   default     = false
+}
+
+variable "share_image_ids" {
+  description = "The id of image by share"
+  type        = list(string)
+  default     = []
+}
+
+variable "account_ids" {
+  description = "Alibaba Cloud account id used to share images."
+  type        = list(string)
+  default     = []
 }
