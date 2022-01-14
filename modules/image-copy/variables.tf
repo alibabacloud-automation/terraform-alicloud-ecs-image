@@ -1,22 +1,22 @@
 variable "region" {
-  description = "The region used to launch this module resources."
+  description = "(Deprecated from version 1.3.0) The region used to launch this module resources."
   type        = string
   default     = ""
 }
 
 variable "profile" {
-  description = "The profile name as set in the shared credentials file. If not set, it will be sourced from the ALICLOUD_PROFILE environment variable."
+  description = "(Deprecated from version 1.3.0) The profile name as set in the shared credentials file. If not set, it will be sourced from the ALICLOUD_PROFILE environment variable."
   type        = string
   default     = ""
 }
 variable "shared_credentials_file" {
-  description = "This is the path to the shared credentials file. If this is not set and a profile is specified, $HOME/.aliyun/config.json will be used."
+  description = "(Deprecated from version 1.3.0) This is the path to the shared credentials file. If this is not set and a profile is specified, $HOME/.aliyun/config.json will be used."
   type        = string
   default     = ""
 }
 
 variable "skip_region_validation" {
-  description = "Skip static validation of region ID. Used by users of alternative AlibabaCloud-like APIs or users w/ access to regions that are not public (yet)."
+  description = "(Deprecated from version 1.3.0) Skip static validation of region ID. Used by users of alternative AlibabaCloud-like APIs or users w/ access to regions that are not public (yet)."
   type        = bool
   default     = false
 }
@@ -24,6 +24,12 @@ variable "skip_region_validation" {
 #####################
 # image-copy
 #####################
+variable "copy" {
+  description = "Whether to copy the image. Default to 'false'."
+  type        = bool
+  default     = false
+}
+
 variable "image_name" {
   description = "The name of image."
   type        = string
@@ -33,11 +39,13 @@ variable "image_name" {
 variable "source_image_id" {
   description = "The source image ID."
   type        = string
+  default     = ""
 }
 
 variable "source_region_id" {
   description = "The ID of the region to which the source custom image belongs."
   type        = string
+  default     = ""
 }
 
 variable "description" {
@@ -68,10 +76,4 @@ variable "tags" {
   description = "A mapping of tags to assign to the image."
   type        = map(string)
   default     = {}
-}
-
-variable "copy" {
-  description = "Whether to copy the image. Default to 'false'."
-  type        = bool
-  default     = false
 }

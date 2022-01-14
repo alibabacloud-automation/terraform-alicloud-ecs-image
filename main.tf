@@ -4,12 +4,12 @@ resource "random_uuid" "this" {}
 # create image by instance_id
 #####################
 resource "alicloud_image" "with_instance" {
-  count = var.create ? var.instance_id != "" ? 1 : 0 : 0
+  count = var.create ? 1 : var.create_image_by_instance ? 1 : 0
 
   image_name        = var.image_name != "" ? var.image_name : substr("tf-instance-image-${replace(random_uuid.this.result, "-", "")}", 0, 32)
   architecture      = var.image_create_architecture
   instance_id       = var.instance_id
-  description       = "An image comes from instance var.instance_id and created by Terraform."
+  description       = var.instance_image_description
   platform          = var.instance_image_create_platform
   resource_group_id = var.resource_group_id
   force             = var.force
@@ -23,12 +23,12 @@ resource "alicloud_image" "with_instance" {
 # create image by snapshot_id
 #####################
 resource "alicloud_image" "with_snapshot" {
-  count = var.create ? var.snapshot_id != "" ? 1 : 0 : 0
+  count = var.create ? 1 : var.create_image_by_snapshot ? 1 : 0
 
-  image_name        = var.image_name != "" ? var.image_name : substr("tf-snapshot-image-${replace(random_uuid.this.result, "-", "")}", 0, 32)
+  image_name        = var.snapshot_image_name != "" ? var.snapshot_image_name : substr("tf-snapshot-image-${replace(random_uuid.this.result, "-", "")}", 0, 32)
   architecture      = var.image_create_architecture
   snapshot_id       = var.snapshot_id
-  description       = "An image comes from snapshot var.snapshot_id and created by Terraform."
+  description       = var.snapshot_image_description
   platform          = var.snapshot_image_create_platform
   resource_group_id = var.resource_group_id
   force             = var.force
@@ -42,11 +42,11 @@ resource "alicloud_image" "with_snapshot" {
 # create image by disk
 #####################
 resource "alicloud_image" "with_disk" {
-  count = var.create ? length(var.disk_device_mapping) > 0 ? 1 : 0 : 0
+  count = var.create ? 1 : var.create_image_by_disk ? 1 : 0
 
-  image_name        = var.image_name != "" ? var.image_name : substr("tf-disk-image-${replace(random_uuid.this.result, "-", "")}", 0, 32)
+  image_name        = var.disk_image_name != "" ? var.disk_image_name : substr("tf-disk-image-${replace(random_uuid.this.result, "-", "")}", 0, 32)
   architecture      = var.image_create_architecture
-  description       = "An image comes from disk device mapping and created by Terraform."
+  description       = var.disk_image_description
   platform          = var.disk_image_create_platform
   resource_group_id = var.resource_group_id
   force             = var.force
@@ -69,17 +69,17 @@ resource "alicloud_image" "with_disk" {
 # image-export
 #####################
 locals {
-  share_image_id  = flatten([alicloud_image.with_instance.*.id, alicloud_image.with_snapshot.*.id, alicloud_image.with_disk.*.id, alicloud_image_import.this.*.id])
-  export_image_id = flatten([alicloud_image.with_instance.*.id, alicloud_image.with_snapshot.*.id, alicloud_image.with_disk.*.id])
+  export_image_ids = length(var.export_image_ids) > 0 ? var.export_image_ids : flatten([alicloud_image.with_instance.*.id, alicloud_image.with_snapshot.*.id, alicloud_image.with_disk.*.id])
+  share_image_ids  = length(var.share_image_ids) > 0 ? var.share_image_ids : flatten([alicloud_image.with_instance.*.id, alicloud_image.with_snapshot.*.id, alicloud_image.with_disk.*.id, alicloud_image_import.this.*.id])
 }
 
 resource "alicloud_image_export" "this" {
-  count      = var.export ? length(local.export_image_id) : 0
-  image_id   = local.export_image_id[count.index]
+  count      = var.export ? length(local.export_image_ids) : 0
+  image_id   = local.export_image_ids[count.index]
   oss_bucket = var.export_oss_bucket
   oss_prefix = var.oss_prefix
   timeouts {
-    create = "20m"
+    create = var.create_timeouts
   }
 }
 
@@ -100,14 +100,18 @@ resource "alicloud_image_import" "this" {
     oss_bucket = lookup(var.import_disk_device_mapping, "import_oss_bucket")
     oss_object = lookup(var.import_disk_device_mapping, "oss_object")
   }
+
 }
 
 #####################
 # image-share-permission-permisstion
 #####################
 module "image_share_permission" {
-  source      = "./modules/image-share-permission"
-  share       = var.share
-  image_ids   = local.share_image_id
+  source = "./modules/image-share-permission"
+
+  share = var.share
+
+  image_ids   = local.share_image_ids
   account_ids = var.account_ids
+
 }
