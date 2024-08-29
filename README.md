@@ -112,10 +112,7 @@ This Module provides templates for coping image and sharing image.
 
 ## Examples
 
-* [Image-create](https://github.com/terraform-alicloud-modules/terraform-alicloud-ecs-image/tree/master/examples/image-create)
-* [Image-copy](https://github.com/terraform-alicloud-modules/terraform-alicloud-ecs-image/tree/master/examples/image-copy)
-* [Image-share-permission](https://github.com/terraform-alicloud-modules/terraform-alicloud-ecs-image/tree/master/examples/image-share-permission)
-
+* [Complete Example](https://github.com/terraform-alicloud-modules/terraform-alicloud-ecs-image/tree/master/examples/complete)
 
 ## Notes
 From the version v1.2.0, the module has removed the following `provider` setting:
