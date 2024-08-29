@@ -36,7 +36,7 @@ module "security_group" {
 module "ecs_instance" {
   source = "alibaba/ecs-instance/alicloud"
 
-  number_of_instances = 1
+  number_of_instances = 2
 
   instance_type      = data.alicloud_instance_types.default.instance_types.0.id
   image_id           = data.alicloud_images.default.images.0.id
@@ -49,9 +49,11 @@ resource "alicloud_ecs_disk_attachment" "default" {
   instance_id = module.ecs_instance.this_instance_id[0]
 }
 
+resource "random_uuid" "this" {}
+
 module "oss_bucket" {
   source      = "terraform-alicloud-modules/oss-bucket/alicloud"
-  bucket_name = "tf-oss-bucket-2022"
+  bucket_name = "tf-oss-bucket-${random_uuid.this.result}"
   acl         = "public-read"
 }
 
@@ -70,7 +72,7 @@ module "image_create" {
   #create image by instance_id
   create_image_by_instance = true
 
-  image_name                     = var.image_name
+  image_name                     = "${var.image_name}-${random_uuid.this.result}"
   image_create_architecture      = "x86_64"
   instance_id                    = module.ecs_instance.this_instance_id[0]
   instance_image_description     = var.instance_image_description
@@ -82,7 +84,7 @@ module "image_create" {
   #create image by snapshot_id
   create_image_by_snapshot = true
 
-  snapshot_image_name            = var.snapshot_image_name
+  snapshot_image_name            = "${var.snapshot_image_name}-${random_uuid.this.result}"
   snapshot_id                    = alicloud_ecs_snapshot.default.id
   snapshot_image_description     = var.snapshot_image_description
   snapshot_image_create_platform = "Ubuntu"
@@ -90,7 +92,7 @@ module "image_create" {
   #create image by disk
   create_image_by_disk = true
 
-  disk_image_name            = var.disk_image_name
+  disk_image_name            = "${var.disk_image_name}-${random_uuid.this.result}"
   disk_image_description     = var.disk_image_description
   disk_image_create_platform = "Ubuntu"
   disk_device_mapping = [
@@ -111,6 +113,14 @@ module "image_create" {
   #Share image
   share = false
 
+  depends_on = [alicloud_ecs_snapshot.default]
+
+}
+
+resource "alicloud_image" "image_export" {
+  instance_id = module.ecs_instance.this_instance_id[1]
+  image_name  = "terraform-example-${random_uuid.this.result}"
+  description = "terraform-example"
 }
 
 #Export image
@@ -129,7 +139,7 @@ module "image_export" {
   #Export image
   export = true
 
-  export_image_ids  = [module.image_create.this_create_image_ids[0]]
+  export_image_ids  = [alicloud_image.image_export.id]
   export_oss_bucket = module.oss_bucket.this_oss_bucket_id
   oss_prefix        = "tf"
   create_timeouts   = var.create_timeouts
@@ -176,4 +186,37 @@ module "image_import" {
   #Share image
   share = false
 
+}
+
+data "alicloud_regions" "default" {
+  current = true
+}
+
+provider "alicloud" {
+  region = "cn-hangzhou"
+  alias  = "hz"
+}
+
+module "image_copy" {
+  source = "../../modules/image-copy"
+  providers = {
+    alicloud = alicloud.hz
+  }
+
+  copy             = true
+  source_image_id  = alicloud_image.image_export.id
+  source_region_id = data.alicloud_regions.default.regions.0.id
+}
+
+variable "another_uid" {
+  default = "123456789"
+}
+
+
+module "image_share_permission" {
+  source = "../../modules/image-share-permission"
+
+  share       = true
+  account_ids = [var.another_uid]
+  image_ids   = [alicloud_image.image_export.id]
 }

@@ -109,9 +109,7 @@ module "image_import" {
 
 ## 示例
 
-* [镜像创建示例](https://github.com/terraform-alicloud-modules/terraform-alicloud-ecs-image/tree/master/examples/image-create)
-* [镜像复制示例](https://github.com/terraform-alicloud-modules/terraform-alicloud-ecs-image/tree/master/examples/image-copy)
-* [镜像分享示例](https://github.com/terraform-alicloud-modules/terraform-alicloud-ecs-image/tree/master/examples/image-share-permission)
+* [完整示例](https://github.com/terraform-alicloud-modules/terraform-alicloud-ecs-image/tree/master/examples/complete)
 
 
 ## 注意事项
