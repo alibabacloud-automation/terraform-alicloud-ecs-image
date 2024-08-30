@@ -1,4 +1,9 @@
-## 1.3.0 (Unreleased)
+## 1.4.0 (Unreleased)
+## 1.3.0 (August 30, 2024)
+
+- examples/complete: improve the examples; example: deprecate image-create, image-copy, image-share-permission [GH-7](https://github.com/alibabacloud-automation/terraform-alicloud-ecs-image/pull/7)
+
+
 ## 1.2.0 (December 6, 2021)
 
 ENHANCEMENTS:
