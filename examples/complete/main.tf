@@ -5,11 +5,13 @@ data "alicloud_resource_manager_resource_groups" "default" {
 }
 
 data "alicloud_images" "default" {
-  name_regex = "ubuntu"
+  name_regex = "^ubuntu_18.*64"
 }
 
 data "alicloud_instance_types" "default" {
   availability_zone = data.alicloud_zones.default.zones.0.id
+  cpu_core_count    = 1
+  memory_size       = 2
 }
 
 resource "alicloud_ecs_disk" "default" {
