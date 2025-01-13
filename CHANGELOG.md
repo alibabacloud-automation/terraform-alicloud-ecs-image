@@ -1,4 +1,8 @@
-## 1.5.0 (Unreleased)
+## 2.1.0 (Unreleased)
+## 2.0.0 (January 13, 2025)
+
+- module: remove deprecated attributes; examples/complete: improve the examples [GH-9](https://github.com/alibabacloud-automation/terraform-alicloud-ecs-image/pull/9)
+
 ## 1.4.0 (September 10, 2024)
 
 - examples/complete: improve the examples [GH-8](https://github.com/alibabacloud-automation/terraform-alicloud-ecs-image/pull/8)
