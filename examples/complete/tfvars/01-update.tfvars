@@ -1,6 +1,3 @@
-#alicloud_ecs_disk
-system_disk_size = 50
-
 #Create image
 image_name                 = "update-tf-testacc-image"
 snapshot_image_name        = "update-tf-testacc-snapshot-image"
