@@ -54,7 +54,7 @@ resource "alicloud_image" "with_disk" {
     for_each = var.disk_device_mapping
     content {
       device      = lookup(disk_device_mapping.value, "device", null)
-      size        = lookup(disk_device_mapping.value, "size")
+      size        = disk_device_mapping.value["size"]
       disk_type   = lookup(disk_device_mapping.value, "disk_type", null)
       snapshot_id = lookup(disk_device_mapping.value, "snapshot_id", null)
     }
@@ -69,8 +69,8 @@ resource "alicloud_image" "with_disk" {
 # image-export
 #####################
 locals {
-  export_image_ids = length(var.export_image_ids) > 0 ? var.export_image_ids : flatten([alicloud_image.with_instance.*.id, alicloud_image.with_snapshot.*.id, alicloud_image.with_disk.*.id])
-  share_image_ids  = length(var.share_image_ids) > 0 ? var.share_image_ids : flatten([alicloud_image.with_instance.*.id, alicloud_image.with_snapshot.*.id, alicloud_image.with_disk.*.id, alicloud_image_import.this.*.id])
+  export_image_ids = length(var.export_image_ids) > 0 ? var.export_image_ids : flatten([alicloud_image.with_instance[*].id, alicloud_image.with_snapshot[*].id, alicloud_image.with_disk[*].id])
+  share_image_ids  = length(var.share_image_ids) > 0 ? var.share_image_ids : flatten([alicloud_image.with_instance[*].id, alicloud_image.with_snapshot[*].id, alicloud_image.with_disk[*].id, alicloud_image_import.this[*].id])
 }
 
 resource "alicloud_image_export" "this" {
@@ -97,8 +97,8 @@ resource "alicloud_image_import" "this" {
   os_type      = var.os_type
 
   disk_device_mapping {
-    oss_bucket = lookup(var.import_disk_device_mapping, "import_oss_bucket")
-    oss_object = lookup(var.import_disk_device_mapping, "oss_object")
+    oss_bucket = var.import_disk_device_mapping["import_oss_bucket"]
+    oss_object = var.import_disk_device_mapping["oss_object"]
   }
 
 }

@@ -9,13 +9,12 @@ data "alicloud_images" "default" {
 }
 
 data "alicloud_instance_types" "default" {
-  availability_zone = data.alicloud_zones.default.zones.0.id
-  cpu_core_count    = 1
-  memory_size       = 2
+  availability_zone    = data.alicloud_zones.default.zones[0].id
+  instance_type_family = "ecs.c6"
 }
 
 resource "alicloud_ecs_disk" "default" {
-  zone_id = data.alicloud_zones.default.zones.0.id
+  zone_id = data.alicloud_zones.default.zones[0].id
   size    = var.system_disk_size
 }
 
@@ -31,17 +30,20 @@ resource "alicloud_oss_bucket_object" "default" {
 }
 
 module "security_group" {
-  source = "alibaba/security-group/alicloud"
+  source  = "alibaba/security-group/alicloud"
+  version = "~>2.4.0"
+
   vpc_id = module.vpc.this_vpc_id
 }
 
 module "ecs_instance" {
-  source = "alibaba/ecs-instance/alicloud"
+  source  = "alibaba/ecs-instance/alicloud"
+  version = "~>2.12.0"
 
   number_of_instances = 2
 
-  instance_type      = data.alicloud_instance_types.default.instance_types.0.id
-  image_id           = data.alicloud_images.default.images.0.id
+  instance_type      = data.alicloud_instance_types.default.instance_types[0].id
+  image_id           = data.alicloud_images.default.images[0].id
   vswitch_ids        = [module.vpc.this_vswitch_ids[0]]
   security_group_ids = [module.security_group.this_security_group_id]
 }
@@ -55,16 +57,19 @@ resource "random_uuid" "this" {}
 
 module "oss_bucket" {
   source      = "terraform-alicloud-modules/oss-bucket/alicloud"
+  version     = "~>1.5.0"
   bucket_name = "tf-oss-bucket-${random_uuid.this.result}"
   acl         = "public-read"
 }
 
 module "vpc" {
-  source             = "alibaba/vpc/alicloud"
+  source  = "alibaba/vpc/alicloud"
+  version = "~>1.11.0"
+
   create             = true
   vpc_cidr           = "172.16.0.0/16"
   vswitch_cidrs      = ["172.16.0.0/21"]
-  availability_zones = [data.alicloud_zones.default.zones.0.id]
+  availability_zones = [data.alicloud_zones.default.zones[0].id]
 }
 
 #Create image
@@ -79,7 +84,7 @@ module "image_create" {
   instance_id                    = module.ecs_instance.this_instance_id[0]
   instance_image_description     = var.instance_image_description
   instance_image_create_platform = "Ubuntu"
-  resource_group_id              = data.alicloud_resource_manager_resource_groups.default.groups.0.id
+  resource_group_id              = data.alicloud_resource_manager_resource_groups.default.groups[0].id
   force                          = var.force
   tags                           = var.tags
 
@@ -207,12 +212,10 @@ module "image_copy" {
 
   copy             = true
   source_image_id  = alicloud_image.image_export.id
-  source_region_id = data.alicloud_regions.default.regions.0.id
+  source_region_id = data.alicloud_regions.default.regions[0].id
 }
 
-variable "another_uid" {
-  default = "123456789"
-}
+
 
 
 module "image_share_permission" {

@@ -76,9 +76,8 @@ variable "description" {
   default     = "tf-testacc-description"
 }
 
-#Copy image
-variable "cpoy_image_name" {
-  description = "The name of copied image."
+variable "another_uid" {
+  description = "The uid of another user."
   type        = string
-  default     = "tf-testacc-copy-image"
+  default     = "123456789"
 }
