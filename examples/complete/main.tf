@@ -1,21 +1,30 @@
+provider "alicloud" {
+  region = "cn-zhangjiakou"
+}
+
 data "alicloud_zones" "default" {
 }
 
 data "alicloud_resource_manager_resource_groups" "default" {
 }
 
-data "alicloud_images" "default" {
-  name_regex = "^ubuntu_18.*64"
-}
-
 data "alicloud_instance_types" "default" {
   availability_zone    = data.alicloud_zones.default.zones[0].id
-  instance_type_family = "ecs.c6"
+  cpu_core_count       = 2
+  memory_size          = 8
+  instance_type_family = "ecs.g9i"
+}
+
+data "alicloud_images" "default" {
+  owners        = "system"
+  most_recent   = true
+  instance_type = data.alicloud_instance_types.default.instance_types[0].id
 }
 
 resource "alicloud_ecs_disk" "default" {
-  zone_id = data.alicloud_zones.default.zones[0].id
-  size    = var.system_disk_size
+  zone_id  = data.alicloud_zones.default.zones[0].id
+  size     = var.system_disk_size
+  category = "cloud_essd"
 }
 
 resource "alicloud_ecs_snapshot" "default" {
@@ -42,10 +51,11 @@ module "ecs_instance" {
 
   number_of_instances = 2
 
-  instance_type      = data.alicloud_instance_types.default.instance_types[0].id
-  image_id           = data.alicloud_images.default.images[0].id
-  vswitch_ids        = [module.vpc.this_vswitch_ids[0]]
-  security_group_ids = [module.security_group.this_security_group_id]
+  instance_type        = data.alicloud_instance_types.default.instance_types[0].id
+  image_id             = data.alicloud_images.default.images[0].image_id
+  vswitch_ids          = [module.vpc.this_vswitch_ids[0]]
+  security_group_ids   = [module.security_group.this_security_group_id]
+  system_disk_category = "cloud_essd"
 }
 
 resource "alicloud_ecs_disk_attachment" "default" {
@@ -83,7 +93,7 @@ module "image_create" {
   image_create_architecture      = "x86_64"
   instance_id                    = module.ecs_instance.this_instance_id[0]
   instance_image_description     = var.instance_image_description
-  instance_image_create_platform = "Ubuntu"
+  instance_image_create_platform = data.alicloud_images.default.images[0].platform
   resource_group_id              = data.alicloud_resource_manager_resource_groups.default.groups[0].id
   force                          = var.force
   tags                           = var.tags
@@ -94,14 +104,14 @@ module "image_create" {
   snapshot_image_name            = "${var.snapshot_image_name}-${random_uuid.this.result}"
   snapshot_id                    = alicloud_ecs_snapshot.default.id
   snapshot_image_description     = var.snapshot_image_description
-  snapshot_image_create_platform = "Ubuntu"
+  snapshot_image_create_platform = data.alicloud_images.default.images[0].platform
 
   #create image by disk
   create_image_by_disk = true
 
   disk_image_name            = "${var.disk_image_name}-${random_uuid.this.result}"
   disk_image_description     = var.disk_image_description
-  disk_image_create_platform = "Ubuntu"
+  disk_image_create_platform = data.alicloud_images.default.images[0].platform
   disk_device_mapping = [
     {
       device      = "/dev/xvda"
