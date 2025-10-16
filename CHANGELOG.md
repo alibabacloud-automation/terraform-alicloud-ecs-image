@@ -1,3 +1,10 @@
+## [2.0.1](https://github.com/alibabacloud-automation/terraform-alicloud-ecs-image/compare/v2.0.0...v2.0.1) (2025-10-16)
+
+
+### Bug Fixes
+
+* improve the examples ([a696a65](https://github.com/alibabacloud-automation/terraform-alicloud-ecs-image/commit/a696a6500ab21fb184b31066f473b8f68914d2db))
+
 ## 2.1.0 (Unreleased)
 ## 2.0.0 (January 13, 2025)
 
