@@ -40,14 +40,14 @@ resource "alicloud_oss_bucket_object" "default" {
 
 module "security_group" {
   source  = "alibaba/security-group/alicloud"
-  version = "~>2.4.0"
+  version = "3.0.0"
 
   vpc_id = module.vpc.this_vpc_id
 }
 
 module "ecs_instance" {
   source  = "alibaba/ecs-instance/alicloud"
-  version = "~>2.12.0"
+  version = "3.0.0"
 
   number_of_instances = 2
 
@@ -67,14 +67,14 @@ resource "random_uuid" "this" {}
 
 module "oss_bucket" {
   source      = "terraform-alicloud-modules/oss-bucket/alicloud"
-  version     = "~>1.5.0"
+  version     = "2.0.0"
   bucket_name = "tf-oss-bucket-${random_uuid.this.result}"
   acl         = "public-read"
 }
 
 module "vpc" {
   source  = "alibaba/vpc/alicloud"
-  version = "~>1.11.0"
+  version = "2.0.0"
 
   create             = true
   vpc_cidr           = "172.16.0.0/16"
