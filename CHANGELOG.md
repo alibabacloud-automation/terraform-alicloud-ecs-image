@@ -1,3 +1,10 @@
+## [3.0.1](https://github.com/alibabacloud-automation/terraform-alicloud-ecs-image/compare/v3.0.0...v3.0.1) (2026-04-22)
+
+
+### Bug Fixes
+
+* update version of the dependency module ([a4688b2](https://github.com/alibabacloud-automation/terraform-alicloud-ecs-image/commit/a4688b21ee8c4468b3eabb73acccd1a3862e4614))
+
 ## [3.0.0](https://github.com/alibabacloud-automation/terraform-alicloud-ecs-image/compare/v2.0.2...v3.0.0) (2026-04-22)
 
 
