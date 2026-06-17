@@ -17,6 +17,9 @@ resource "alicloud_image" "with_instance" {
     Created = "Terraform"
     Source  = "Instance:${var.instance_id}"
   }, var.tags)
+  timeouts {
+    create = "20m"
+  }
 }
 
 #####################
