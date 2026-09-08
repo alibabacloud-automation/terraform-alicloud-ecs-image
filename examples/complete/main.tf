@@ -1,5 +1,5 @@
 provider "alicloud" {
-  region = "cn-zhangjiakou"
+  region = "ap-southeast-5"
 }
 
 data "alicloud_zones" "default" {
@@ -16,8 +16,8 @@ data "alicloud_instance_types" "default" {
 }
 
 data "alicloud_images" "default" {
+  os_type       = "linux"
   owners        = "system"
-  most_recent   = true
   instance_type = data.alicloud_instance_types.default.instance_types[0].id
 }
 
@@ -138,6 +138,9 @@ resource "alicloud_image" "image_export" {
   instance_id = module.ecs_instance.this_instance_id[1]
   image_name  = "terraform-example-${random_uuid.this.result}"
   description = "terraform-example"
+  timeouts {
+    create = "20m"
+  }
 }
 
 #Export image
